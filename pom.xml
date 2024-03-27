@@ -12,8 +12,9 @@
     <groupId>com.moon</groupId>
     <artifactId>openapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>openapi</name>
-    <description>opi开放平台</description>
+    <description>api开放平台</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
