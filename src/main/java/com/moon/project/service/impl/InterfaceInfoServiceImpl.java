@@ -9,8 +9,6 @@ import com.moon.project.service.InterfaceInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
 /**
 * @author chenliang
 * @description 针对表【interface_info】的数据库操作Service实现
@@ -22,18 +20,10 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     @Override
     public void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add) {
-         Long id = interfaceInfo.getId();
-         String name = interfaceInfo.getName();
-         String description = interfaceInfo.getDescription();
-         String url = interfaceInfo.getUrl();
-         String requestHeader = interfaceInfo.getRequestHeader();
-         String responseHeader = interfaceInfo.getResponseHeader();
-         Integer status = interfaceInfo.getStatus();
-         String method = interfaceInfo.getMethod();
-         Long userId = interfaceInfo.getUserId();
-         Date createTime = interfaceInfo.getCreateTime();
-         Date updateTime = interfaceInfo.getUpdateTime();
-         Integer isDelete = interfaceInfo.getIsDelete();
+        if(interfaceInfo==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String name = interfaceInfo.getName();
 
         //修改校验，设置校验规则
         if (add) {

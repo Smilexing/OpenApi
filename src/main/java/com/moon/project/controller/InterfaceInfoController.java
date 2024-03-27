@@ -268,7 +268,7 @@ public class InterfaceInfoController {
      * @param request
      * @return
      */
-    @PostMapping("/invoke")
+    @PostMapping("/InterfaceInfo")
     public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
                                                     HttpServletRequest request) {
         //判断接口参数是否为空
