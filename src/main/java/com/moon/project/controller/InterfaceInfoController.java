@@ -2,18 +2,19 @@ package com.moon.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.client.MoonClient;
+import com.google.gson.Gson;
 import com.moon.project.annotation.AuthCheck;
-import com.moon.project.common.BaseResponse;
-import com.moon.project.common.DeleteRequest;
-import com.moon.project.common.ErrorCode;
-import com.moon.project.common.ResultUtils;
+import com.moon.project.common.*;
 import com.moon.project.constant.CommonConstant;
 import com.moon.project.exception.BusinessException;
 import com.moon.project.model.dto.interfaceinfo.InterfaceInfoAddRequest;
+import com.moon.project.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.moon.project.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.moon.project.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
 import com.moon.project.model.entity.InterfaceInfo;
 import com.moon.project.model.entity.User;
+import com.moon.project.model.enums.InterfaceInfoStatusEnum;
 import com.moon.project.service.InterfaceInfoService;
 import com.moon.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,8 @@ public class InterfaceInfoController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private MoonClient moonClient;
 
     // region 增删改查
 
@@ -196,4 +199,99 @@ public class InterfaceInfoController {
 
     // endregion
 
+    /**
+     * 发布
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("online")
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        //判断接口参数是否为空
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //判断接口是否存在
+        long id=idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = InterfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        //判断接口是否可以被调用
+        com.example.model.User user=new com.example.model.User();
+        user.setUsername("test");
+        String username = moonClient.getNameByBody(user);
+        if (StringUtils.isBlank(username)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"接口验证失败");
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceInfo=new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+        boolean result = InterfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 下线
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @AuthCheck(mustRole = "admin")
+    @PostMapping("/offline")
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                      HttpServletRequest request) {
+        //判断接口参数是否为空
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //判断接口是否存在
+        long id=idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = InterfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 仅本人或管理员可修改
+        InterfaceInfo interfaceInfo=new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
+        boolean result = InterfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 在线调用
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/invoke")
+    public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                    HttpServletRequest request) {
+        //判断接口参数是否为空
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //判断接口是否存在
+        long id=interfaceInfoInvokeRequest.getId();
+        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+        InterfaceInfo oldInterfaceInfo = InterfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getStatus() ==InterfaceInfoStatusEnum.OFFLINE.getValue() ) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口已关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        MoonClient tempClient = new MoonClient(accessKey, secretKey);
+        Gson gson=new Gson();
+        com.example.model.User user=gson.fromJson(userRequestParams, com.example.model.User.class);
+        String usernameByBody = tempClient.getNameByBody(user);
+        return ResultUtils.success(usernameByBody);
+    }
 }

@@ -46,6 +46,17 @@ public class User implements Serializable {
     private String userRole;
 
     /**
+     * 签名 accessKey
+     */
+    private String accessKey;
+
+    /**
+     * 签名 secretKey
+     */
+    private String secretKey;
+
+
+    /**
      * 密码
      */
     private String userPassword;
