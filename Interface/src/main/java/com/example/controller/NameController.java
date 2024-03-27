@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/name")
 public class NameController {
-    @GetMapping("/name")
+    @GetMapping("/")
     public String getNameByGet(String name,HttpServletRequest request){
         System.out.println(request.getHeader("yupi"));
 
@@ -23,7 +23,7 @@ public class NameController {
     public String getNameByBody(@RequestBody User user, HttpServletRequest request){
         String accessKey=request.getHeader("accessKey");
         String nonce=request.getHeader("nonce");
-        String timestramp=request.getHeader("timestramp");
+        String timestamp=request.getHeader("timestamp");
         String sign=request.getHeader("sign");
         String body=request.getHeader("body");
         //TODO 实际是去数据库查是否已分配给用户
@@ -35,7 +35,7 @@ public class NameController {
             throw new RuntimeException("无权限");
         }
         //TODO 时间戳：时间和当前时间不超过5分钟
-        //if(timestramp){}
+        //if(timestamp){}
         //TODo 实际情况是从数据库中查询出 secretKey
         String serverSign= SignUtil.getSign(body,"abcdefg");
         if (!sign.equals(serverSign)){

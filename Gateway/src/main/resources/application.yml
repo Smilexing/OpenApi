@@ -4,14 +4,15 @@ server:
 spring:
   cloud:
     gateway:
+      default-filters:
+        - AddRequestHeader=source,yupi
       routes:
-        - id: add_request_header_route
+        - id: api_route
           uri: http://localhost:8123
           predicates:
             - Path=/api/**
-          filters:
-            - AddRequestHeader=yupi, hello
-            - AddRequestParameter=name, MoonLight
+
+
 logging:
   level:
     org:
