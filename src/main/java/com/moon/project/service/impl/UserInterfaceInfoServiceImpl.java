@@ -35,7 +35,12 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不能小于0");
         }
     }
-
+    /**
+     * 统计调用次数——操作数据库
+     * @param userId
+     * @param interfaceInfoId
+     * @return
+     */
     @Override
     public boolean invokeInterfaceCount(long userId, long interfaceInfoId) {
         if (userId <= 0 || interfaceInfoId <= 0) {

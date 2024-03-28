@@ -1,6 +1,9 @@
 spring:
   application:
     name: openapi
+  cloud:
+    nacos:
+      server-addr: 172.33.172.241:8848 # nacos服务地址
   # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -36,3 +39,12 @@ moon:
   client:
     access-key: moon
     secret-key: abcdefg
+#dubbo:
+#  application:
+#    name: dubbo-openapi
+#  protocol:
+#    port: -1
+#    name: dubbo
+#  registry:
+#    address: 192.168.88.130:8848 # Nacos地址
+#    id: nacos-registry

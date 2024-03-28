@@ -2,6 +2,7 @@ package com.moon.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.moon.project.model.entity.UserInterfaceInfo;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author chenliang
@@ -9,6 +10,7 @@ import com.moon.project.model.entity.UserInterfaceInfo;
 * @createDate 2023-07-14 17:02:26
 * @Entity com.moon.project.model.entity.UserInterfaceInfo
 */
+@Mapper
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
 
 }
